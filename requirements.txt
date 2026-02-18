@@ -140,4 +140,4 @@ gunicorn==25.0.3
 
 
 
-gunicorn==22.2.0
+
