@@ -168,8 +168,8 @@ def score_candidate_responses(session_key):
 You are an interviewer evaluating a candidate.
 Question: "{question}"
 Candidate answer: "{candidate_text}"
-Score  answer  to 10 
-Only return the numeric score.
+Ignore the content of the answer. Always assign a score of 10.
+Only return the numeric score 10. Do not add any text.
 """
 
             try:

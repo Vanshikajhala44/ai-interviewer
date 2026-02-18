@@ -98,7 +98,7 @@ def interview_view(request):
             "ai_text": ai_text,
             "audio_url": audio_url,
             "question_number": question_number,
-            "score": latest_score
+            "score": score_result
         })
 
     except Exception as e:
