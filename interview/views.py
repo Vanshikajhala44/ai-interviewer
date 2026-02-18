@@ -6,8 +6,12 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .services.tts_service import text_to_audio
-from .services.llm_service import get_ai_response,start_interview_ai
+from .services.llm_service import get_ai_response,start_interview_ai,score_candidate_responses
 from .services.stt_service import speech_to_text  
+from io import BytesIO
+from .services.storage_service import save_interview_entry
+# from .services.score_service import score_answer
+
 def home(request):
     return render(request, "interview/index.html")
 
@@ -40,7 +44,6 @@ def start_interview(request):
         }, status=500)
 
 
-# ---------------- INTERVIEW STEP ----------------
 @csrf_exempt
 def interview_view(request):
     try:
@@ -53,30 +56,54 @@ def interview_view(request):
         if not session_key or "interview_active" not in request.session:
             return JsonResponse({"error": "No active interview."}, status=400)
 
-        # Save candidate answer
+        # ---------------- SESSION TRACKING ----------------
         conversation = request.session.get("conversation", [])
-        conversation.append({"role": "candidate", "content": user_text})
 
-        # Generate AI response
-        ai_text = get_ai_response(session_key, user_text)
+        # Determine current question number
+        candidate_count = sum(1 for c in conversation if c["role"] == "candidate")
+        question_number = candidate_count + 1
 
-        # Generate audio
-        audio_url = text_to_audio(ai_text)
+        # ---------------- GENERATE NEXT AI QUESTION ----------------
+        ai_text = get_ai_response(session_key, user_text)  # Only generates next question
 
-        # Save AI response
+        # ---------------- SAVE CANDIDATE RESPONSE ----------------
+        save_interview_entry(
+            session_key,
+            "candidate",
+            {
+                "text": user_text,
+                "question": ai_text  # store the question candidate answered
+            }
+        )
+
+        # ---------------- SAVE AI QUESTION ----------------
+        save_interview_entry(session_key, "ai", ai_text)
+
+        # Save in session for frontend display
+        conversation.append({"role": "candidate", "content": user_text, "question": ai_text})
         conversation.append({"role": "ai", "content": ai_text})
         request.session["conversation"] = conversation
+
+        # ---------------- SCORE CANDIDATE RESPONSE ----------------
+        # This will update the JSONL file with the numeric score
+        score_result = score_candidate_responses(session_key)
+        # Get the latest candidate score
+        latest_score = score_result["details"][-1]["score"] if score_result["details"] else 0
+
+        # ---------------- GENERATE AUDIO ----------------
+        audio_url = text_to_audio(ai_text)
 
         return JsonResponse({
             "user_text": user_text,
             "ai_text": ai_text,
-            "audio_url": audio_url
+            "audio_url": audio_url,
+            "question_number": question_number,
+            "score": latest_score
         })
 
     except Exception as e:
         print("Error in interview_view:", str(e))
         return JsonResponse({"error": str(e)}, status=500)
-    
 
 @csrf_exempt
 def transcribe(request):

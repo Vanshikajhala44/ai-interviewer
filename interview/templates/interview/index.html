@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html>
 <head>
     <title>AI Interviewer</title>
@@ -172,5 +172,284 @@ doneBtn.addEventListener("click", async () => {
 });
 
 </script>
+</body>
+</html> {% endcomment %}
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>AI Interviewer</title>
+    <style>
+        /* -------- BODY & CONTAINER -------- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1c6073, #fef6fb);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 600px;
+            max-width: 90%;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* -------- SECTIONS -------- */
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .box {
+            background: #f4f6f8;
+            padding: 14px 16px;
+            border-radius: 10px;
+            min-height: 60px;
+            font-size: 15px;
+            color: #1f2937;
+            line-height: 1.4;
+            overflow-wrap: break-word;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* -------- BUTTONS -------- */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button.primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        button.primary:hover:not(:disabled) {
+            background: #1e40af;
+        }
+
+        button.success {
+            background: #16a34a;
+            color: white;
+        }
+
+        button.success:hover:not(:disabled) {
+            background: #15803d;
+        }
+
+        button.danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        button.danger:hover:not(:disabled) {
+            background: #b91c1c;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* -------- AUDIO PLAYER -------- */
+        audio {
+            width: 100%;
+            margin-top: 5px;
+            border-radius: 8px;
+        }
+
+        /* -------- LABELS -------- */
+        .label {
+            font-weight: 600;
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2> AI Interviewer</h2>
+
+    <div class="section">
+        <span class="label">INTERVIEWER:</span>
+        <div class="box" id="aiText">Click "Start Interview" to begin</div>
+    </div>
+
+    <div class="section">
+        <span class="label">CANDIDATE:</span>
+        <div class="box" id="userText">Your speech will appear here</div>
+    </div>
+
+    <div class="section button-group">
+        <button id="startBtn" class="primary">Start Interview</button>
+        <button id="recordBtn" class="success" disabled>Start Answer</button>
+        <button id="doneBtn" class="danger" disabled>Done</button>
+    </div>
+
+    <audio id="audioPlayer" controls></audio>
+</div>
+
+<script>
+    let mediaRecorder, audioChunks = [], streamRef, timeout;
+const aiTextEl = document.getElementById("aiText");
+const userTextEl = document.getElementById("userText");
+const audioPlayer = document.getElementById("audioPlayer");
+const startBtn = document.getElementById("startBtn");
+const recordBtn = document.getElementById("recordBtn");
+const doneBtn = document.getElementById("doneBtn");
+
+// ---------------- TIMER ----------------
+function startTimer() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        aiTextEl.innerText = " Ok , your interview is over ,Thank you for your time.";
+        recordBtn.disabled = true;
+        doneBtn.disabled = true;
+    }, 5000);
+}
+function clearTimer() { clearTimeout(timeout); }
+
+// ---------------- PLAY AUDIO ----------------
+async function playAIAudio(url) {
+    return new Promise(resolve => {
+        audioPlayer.src = url;
+        audioPlayer.play().catch(err => console.warn("Audio autoplay blocked:", err));
+        audioPlayer.onended = () => {
+            startTimer();
+            resolve();
+        };
+    });
+}
+
+// ---------------- START INTERVIEW ----------------
+startBtn.addEventListener("click", async () => {
+    aiTextEl.innerText = "AI is starting...";
+    userTextEl.innerText = "";
+    recordBtn.disabled = true;
+    doneBtn.disabled = true;
+
+    try {
+        const res = await fetch("/start/", { method: "POST" });
+        const data = await res.json();
+
+        aiTextEl.innerText = data.ai_text || "[No response]";
+        localStorage.setItem("session_key", data.session_key);
+
+        if (data.audio_url) await playAIAudio(data.audio_url);
+
+        recordBtn.disabled = false;
+        doneBtn.disabled = false;
+    } catch (err) {
+        console.error(err);
+        aiTextEl.innerText = "Error starting interview.";
+    }
+});
+
+// ---------------- RECORD ----------------
+recordBtn.addEventListener("click", async () => {
+    clearTimer();
+    userTextEl.innerText = "Recording...";
+    recordBtn.disabled = true;
+    doneBtn.disabled = false;
+
+    try {
+        streamRef = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(streamRef);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.start();
+    } catch (err) {
+        console.error("Microphone access denied:", err);
+        userTextEl.innerText = "Cannot access microphone.";
+        recordBtn.disabled = false;
+    }
+});
+
+// ---------------- STOP RECORDING ----------------
+doneBtn.addEventListener("click", async () => {
+    doneBtn.disabled = true;
+    if (!mediaRecorder) return;
+
+    mediaRecorder.stop();
+    mediaRecorder.onstop = async () => {
+        // Stop mic
+        streamRef.getTracks().forEach(track => track.stop());
+        const blob = new Blob(audioChunks, { type: "audio/webm" });
+
+        // ---------------- SILENCE DETECTION ----------------
+        if (blob.size < 1000) { // very small blob => likely silence
+            userTextEl.innerText = "[No speech detected]";
+            recordBtn.disabled = false;
+            doneBtn.disabled = false;
+            return; // skip transcription and AI call
+        }
+
+        // ---------------- TRANSCRIBE ----------------
+        let candidateAnswer = "[Transcription failed]";
+        try {
+            const form = new FormData();
+            form.append("audio_file", blob);
+            const res = await fetch("/transcribe/", { method: "POST", body: form });
+            const data = await res.json();
+
+            candidateAnswer = data.text || "[No transcription]";
+            userTextEl.innerText = candidateAnswer; // show candidate text immediately
+
+        } catch (err) {
+            console.error("Transcription error:", err);
+            userTextEl.innerText = "[Transcription failed]";
+        }
+
+        // ---------------- SEND TO AI ----------------
+        try {
+            const res2 = await fetch("/interview/", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `audio_text=${encodeURIComponent(candidateAnswer)}`
+            });
+            const aiData = await res2.json();
+
+            aiTextEl.innerText = aiData.ai_text || "[No response]";
+            if (aiData.audio_url) await playAIAudio(aiData.audio_url);
+
+        } catch (err) {
+            console.error("AI response error:", err);
+        }
+
+        recordBtn.disabled = false;
+        doneBtn.disabled = false;
+        startTimer();
+    };
+});
+
+</script>
+
 </body>
 </html>
