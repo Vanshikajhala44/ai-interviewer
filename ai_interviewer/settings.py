@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "interview",
+    "schedule_interview",
+
 ]
 
 MIDDLEWARE = [
@@ -127,3 +129,12 @@ import os
 load_dotenv()
 
 print("Loaded GROQ KEY:", os.getenv("GROQ_API_KEY"))
+import cloudinary
+import os
+
+cloudinary.config(
+    cloud_name="Root",          # your actual cloud name
+    api_key="872624143927626",  # your actual API key
+    api_secret="ExBid5vylyt_bpwBpef4Zz_ii-A",  # your actual API secret
+    secure=True
+)

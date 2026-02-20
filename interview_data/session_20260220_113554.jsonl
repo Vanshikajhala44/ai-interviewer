@@ -1,0 +1,7 @@
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "What is Python and why is it popular?", "timestamp": "2026-02-20T11:35:59.729241"}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "candidate", "content": "Thank you very much.", "timestamp": "2026-02-20T11:36:33.220243", "score": 0, "total_score": 0}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "What is Python and why is it popular?", "timestamp": "2026-02-20T11:36:36.100127"}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "candidate", "content": "Itan is a programming language and it is popular for simple syntax.", "timestamp": "2026-02-20T11:37:00.668718", "score": 2, "total_score": 2}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "Explain Python data types.", "timestamp": "2026-02-20T11:37:04.368227"}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "candidate", "content": "Basically inside we have multiple data types like string, sample, test, dictionary, sets.", "timestamp": "2026-02-20T11:37:34.742855", "score": 2, "total_score": 4}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "What is Django and why use it?", "timestamp": "2026-02-20T11:37:35.760267"}

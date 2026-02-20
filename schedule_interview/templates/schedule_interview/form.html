@@ -1,0 +1,24 @@
+<!-- schedule_interview/templates/schedule_interview/form.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Schedule Interview</title>
+<style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f4f8; }
+    .container { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
+    button { padding: 10px 20px; border: none; border-radius: 6px; background: #2563eb; color: white; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Schedule Interview</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generate Secret Link</button>
+    </form>
+</div>
+</body>
+</html>

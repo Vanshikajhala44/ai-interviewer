@@ -23,6 +23,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('interview.urls')),
+    path('schedule_interview/', include('schedule_interview.urls')),  
+     
 ]
 
 if settings.DEBUG:
