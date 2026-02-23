@@ -1,0 +1,7 @@
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "Explain Python data types.", "timestamp": "2026-02-23T09:23:04.679971"}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "candidate", "content": "So basically we have multiple little types like this, chopper, lector, reset.", "timestamp": "2026-02-23T09:23:52.185627", "score": 2, "total_score": 2}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "What is Python and why is it popular?", "timestamp": "2026-02-23T09:23:53.694144"}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "candidate", "content": "Python is popular because we can integrate multiple libraries in it and also it is very  helpful in AI and machine learning and it has simple syntax also.", "timestamp": "2026-02-23T09:24:41.141029", "score": 6, "total_score": 8}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "What is Django and why use it?", "timestamp": "2026-02-23T09:24:42.385150"}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "candidate", "content": "We use Django, basically it is a framework in Python by which we can build websites and it is useful in web development and yeah", "timestamp": "2026-02-23T09:27:10.371720", "score": 7, "total_score": 15}
+{"session": "luci5l93n49q51z67ndm5uckrnu7bpeh", "role": "ai", "content": "Explain Django models and migrations.", "timestamp": "2026-02-23T09:27:11.611994"}
