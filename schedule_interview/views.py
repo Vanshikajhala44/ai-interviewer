@@ -4,6 +4,9 @@ from .models import SecretInterview
 from .forms import InterviewForm
 from django.urls import reverse
 
+# def home(request):
+#     return render(request, "schedule_interview/form.html")
+
 def schedule_interview(request):
     if request.method == "POST":
         form = InterviewForm(request.POST)
