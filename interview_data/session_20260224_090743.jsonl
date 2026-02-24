@@ -1,0 +1,7 @@
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "ai", "content": "What is Python and why is it popular?", "timestamp": "2026-02-24T09:07:45.396740"}
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "candidate", "content": "Python is popular because it has symbols and text and we can easily like it on Python and yeah, it has a lot of libraries like pandas, numpy.", "timestamp": "2026-02-24T09:08:44.066503", "score": 6, "total_score": 6}
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "ai", "content": "Explain Python data types.", "timestamp": "2026-02-24T09:08:46.271300"}
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "candidate", "content": "Yeah, I said a multiple data types like  list of all  set dictionary  string", "timestamp": "2026-02-24T09:09:31.769350", "score": 2, "total_score": 8}
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "ai", "content": "What is Django and why use it?", "timestamp": "2026-02-24T09:09:33.018826"}
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "candidate", "content": "Yeah, so Django is used for basically in Python we have like two frameworks class can Django  So basically Django is used for web development", "timestamp": "2026-02-24T09:10:10.568890", "score": 7, "total_score": 15}
+{"session": "xu1sgmpkbsxzgngo6w93z2hsogw7t68c", "role": "ai", "content": "Explain Django models and migrations.", "timestamp": "2026-02-24T09:10:12.025053"}
