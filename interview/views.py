@@ -46,22 +46,27 @@ def start_interview(request):
 @csrf_exempt
 def transcribe(request):
     if request.method != "POST" or "audio_file" not in request.FILES:
-        return JsonResponse({"error": "POST with audio_file required"}, status=400)
+        return JsonResponse(
+            {"error": "POST with audio_file required"},
+            status=400
+        )
+
     audio_file = request.FILES["audio_file"]
 
     try:
-        audio_bytes = BytesIO()
-        for chunk in audio_file.chunks():
-            audio_bytes.write(chunk)
-        audio_bytes.seek(0)
-        text = speech_to_text(audio_bytes)
+        text = speech_to_text(audio_file)
+
         if not text.strip():
             text = "[No speech detected]"
+
+        return JsonResponse({"text": text})
+
     except Exception as e:
-        return JsonResponse({"text": "[no response]", "error": str(e)})
-
-    return JsonResponse({"text": text})
-
+        return JsonResponse({
+            "text": "[no response]",
+            "error": str(e)
+        }, status=500)
+    
 @csrf_exempt
 def interview_view(request):
     try:
