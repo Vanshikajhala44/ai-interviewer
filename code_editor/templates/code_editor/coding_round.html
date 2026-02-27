@@ -35,6 +35,11 @@
     .btn-run:hover { background: #4c4c4c; }
     .btn-submit { background: #2d6a2d; color: white; }
     .btn-submit:hover { background: #3d8a3d; }
+    .timer-warning { color: #ef4444 !important; animation: pulse 1s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
   </style>
 </head>
 <body>
@@ -50,13 +55,17 @@
       <h2>{{ question.title }}</h2>
       <span class="badge {{ question.difficulty }}">{{ question.difficulty|title }}</span>
       <p>{{ question.description }}</p>
-      {% comment %} <div class="example-box">
+      {% if question.example_input %}
+      <div class="example-box">
         <strong>Example Input:</strong><br>{{ question.example_input }}<br><br>
         <strong>Example Output:</strong><br>{{ question.example_output }}
-      </div> {% endcomment %}
-      {% comment %} <div class="example-box" style="margin-top:10px;">
+      </div>
+      {% endif %}
+      {% if question.constraints %}
+      <div class="example-box" style="margin-top:10px;">
         <strong>Constraints:</strong><br>{{ question.constraints }}
-      </div> {% endcomment %}
+      </div>
+      {% endif %}
     </div>
 
     <div class="editor-panel">
@@ -95,6 +104,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
   <script>
     let editor;
+    let isSubmitted = false;
+    let timerInterval;
+    
+    // ✅ FIX: Timer variable define kiya
+    // Backend se time set karna ho toh: let timeLeft = {{ time_limit|default:2700 }};
+    let timeLeft = 45 * 60; // 45 minutes = 2700 seconds
 
     const starterCode = {
       python: '# Write your solution here\ndef solution():\n    pass\n',
@@ -103,6 +118,7 @@
       cpp: '#include<iostream>\nusing namespace std;\nint main() {\n    \n    return 0;\n}\n'
     };
 
+    // Monaco Editor initialize
     require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
     require(['vs/editor/editor.main'], function () {
       editor = monaco.editor.create(document.getElementById('editor'), {
@@ -136,62 +152,110 @@
       const stdin = document.getElementById('stdin-input').value;
       document.getElementById('output-box').innerText = 'Running...';
 
-      const response = await fetch('/code/run/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-        body: JSON.stringify({ code, language, stdin })
-      });
+      try {
+        const response = await fetch('/code/run/', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': getCookie('csrftoken') 
+          },
+          body: JSON.stringify({ code, language, stdin })
+        });
 
-      const result = await response.json();
-      document.getElementById('output-box').innerText = result.output || result.stderr || 'No output';
+        const result = await response.json();
+        document.getElementById('output-box').innerText = result.output || result.stderr || 'No output';
+      } catch (error) {
+        document.getElementById('output-box').innerText = 'Error: ' + error.message;
+      }
     }
 
-  // Submit duplicate rokne ke liye
-let isSubmitted = false;
+    async function submitCode() {
+      if (isSubmitted) {
+        alert('Already submitted!');
+        return;
+      }
+      
+      const code = editor.getValue();
+      if (!code.trim()) {
+        alert('Please write some code before submitting!');
+        return;
+      }
 
-async function submitCode() {
-  if (isSubmitted) return;  // ← double submit block
-  isSubmitted = true;
+      isSubmitted = true;
 
-  const code = editor.getValue();
-  const language = document.getElementById('language-select').value;
-  const output = document.getElementById('output-box').innerText;
-  const questionId = "{{ question.id }}";
+      const language = document.getElementById('language-select').value;
+      const output = document.getElementById('output-box').innerText;
+      const questionId = "{{ question.id }}";
 
-  const response = await fetch('/code/submit/', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json', 
-      'X-CSRFToken': getCookie('csrftoken') 
-    },
-    body: JSON.stringify({ code, language, output, question_id: questionId })
-  });
+      try {
+        const response = await fetch('/code/submit/', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': getCookie('csrftoken') 
+          },
+          body: JSON.stringify({ 
+            code, 
+            language, 
+            output, 
+            question_id: questionId 
+          })
+        });
 
-  const result = await response.json();
-  if (result.success) {
-    window.location.href = result.redirect;
-  } else {
-    isSubmitted = false;  // error aaye toh dobara try kar sake
-    alert("Submission failed: " + result.error);
-  }
-}
+        const result = await response.json();
+        
+        if (result.success) {
+          clearInterval(timerInterval); // ✅ Timer stop karo
+          alert('Submitted successfully!');
+          window.location.href = result.redirect;
+        } else {
+          isSubmitted = false;
+          alert("Submission failed: " + (result.error || 'Unknown error'));
+        }
+      } catch (error) {
+        isSubmitted = false;
+        alert("Submission failed: " + error.message);
+      }
+    }
 
-// Timer fix — clearInterval karo submit ke baad
-const timerInterval = setInterval(() => {
-  timeLeft--;
-  const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-  const secs = String(timeLeft % 60).padStart(2, '0');
-  document.getElementById('timer').innerText = mins + ':' + secs;
-  
-  
-  if (timeLeft <= 0) {
-    clearInterval(timerInterval);  // ← timer band karo
-    alert('Time is up! Auto submitting...');
-    submitCode();
-  }
-}, 1000);
+    // ✅ Timer start karo
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        
+        const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const secs = String(timeLeft % 60).padStart(2, '0');
+        const timerElement = document.getElementById('timer');
+        timerElement.innerText = mins + ':' + secs;
+        
+        // Last 5 minutes mein warning color
+        if (timeLeft <= 300 && timeLeft > 0) {
+          timerElement.parentElement.classList.add('timer-warning');
+        }
+        
+        // Time up
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          alert('Time is up! Auto submitting...');
+          submitCode();
+        }
+      }, 1000);
+    }
+
+    // Page load hone par timer start karo
+    window.addEventListener('load', function() {
+      startTimer();
+    });
+
+    // Page close hone se pehle warning
+    window.addEventListener('beforeunload', function (e) {
+      if (!isSubmitted) {
+        e.preventDefault();
+        e.returnValue = 'Your code is not submitted yet. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    });
   </script>
 
 </body>
-
 </html>

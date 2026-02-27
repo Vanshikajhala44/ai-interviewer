@@ -10,26 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-37ec#ro)$0(@2y0ptzjv*v@pet$02ra+w!v+-ei9wj*0(l!-!)"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = os.environ.get("DEBUG") == "True"
+ALLOWED_HOSTS = ['ai-interviewer-3ymy.onrender.com']
 
 ALLOWED_HOSTS = ['*']
 
@@ -144,21 +136,24 @@ import cloudinary
 import os
 
 cloudinary.config(
-    cloud_name="Root",          # your actual cloud name
-    api_key="872624143927626",  # your actual API key
-    api_secret="ExBid5vylyt_bpwBpef4Zz_ii-A",  # your actual API secret
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
     secure=True
 )
 
-
-EMAIL_HOST_PASSWORD ='oavv ikpj grij omhl'
-EMAIL_HOST_USER = 'vanshikajhla009@gmail.com'
-DEFAULT_FROM_EMAIL = 'vanshikajhla009@gmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-
 EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+
+
+
 
 import os
 from dotenv import load_dotenv
