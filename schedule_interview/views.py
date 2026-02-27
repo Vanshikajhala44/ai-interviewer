@@ -29,11 +29,26 @@ def schedule_interview(request):
         form = InterviewForm(request.POST)
         
         if form.is_valid():
-            interview = form.save()
+            data = form.cleaned_data
+            
+            interview = SecretInterview.objects.create(
+                candidate_name=data['candidate_name'],
+                candidate_email=data['candidate_email'],
+                interviewer_name=data['interviewer_name'],
+                system_prompt=data['system_prompt'],
+                interview_datetime=data['interview_datetime'],
+                expires_at=data.get('expires_at'),
+                coding_question=data.get('coding_question', ''),
+                coding_topic=data.get('coding_topic', ''),
+                coding_difficulty=data.get('coding_difficulty', ''),
+                coding_language=data.get('coding_language', ''),
+            )
 
-            interview_link = f"https://yoursite.com/interview/{interview.token}/"
+            # interview_link = f"https://yoursite.com/interview/{interview.token}/"
+            interview_link = request.build_absolute_uri(
+             reverse('schedule_interview:verify_passcode', kwargs={'token': interview.token})
+              )
 
-            # Email bhejne ki koshish karo
             try:
                 send_interview_invitation(
                     candidate_name=interview.candidate_name,
@@ -43,10 +58,8 @@ def schedule_interview(request):
                     passcode=interview.passcode,
                 )
             except Exception as e:
-                # Email fail ho toh bhi app crash mat karo
                 print("Email Error:", e)
 
-            # Email success ya fail — dono case mein redirect karo
             return redirect('schedule_interview:schedule_success', token=interview.token)
     else:
         form = InterviewForm()
