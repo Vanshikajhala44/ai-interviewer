@@ -1,24 +1,260 @@
-<!-- schedule_interview/templates/schedule_interview/form.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Schedule Interview</title>
 <style>
-    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f4f8; }
-    .container { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-    input, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
-    button { padding: 10px 20px; border: none; border-radius: 6px; background: #2563eb; color: white; cursor: pointer; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #2c1c73, #fef6fb);
+        min-height: 100vh; padding: 20px;
+    }
+    .page-wrapper {
+        display: flex; gap: 20px; max-width: 1100px;
+        margin: 0 auto; align-items: flex-start;
+    }
+    .container { 
+        background: #fff; padding: 35px 30px; border-radius: 16px;
+        flex: 1; box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    h2 { text-align: center; color: #333; margin-bottom: 25px; font-size: 26px; font-weight: 600; }
+    form { display: flex; flex-direction: column; gap: 16px; }
+    label { font-weight: 600; color: #111827; margin-bottom: 5px; font-size: 14px; display: block; }
+    input[type="text"], input[type="email"], input[type="datetime-local"], textarea, select {
+        width: 100%; padding: 11px 13px; border-radius: 8px; border: 1px solid #d1d5db;
+        font-size: 14px; font-family: inherit; background: #f9fafb; transition: all 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+        outline: none; border-color: #2563eb; background: white;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .errorlist { list-style: none; padding: 8px 12px; background: #fee2e2; color: #991b1b; border-radius: 6px; font-size: 13px; margin-top: 4px; }
+    button[type="submit"] { 
+        padding: 13px; border: none; border-radius: 8px; background: #2563eb;
+        color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%;
+    }
+    button[type="submit"]:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+    /* ── Right Panel ── */
+    .gen-panel {
+        width: 300px; background: #1e1e1e; border-radius: 16px;
+        border: 1px solid #3c3c3c; overflow: hidden;
+        position: sticky; top: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+    .gen-panel-header {
+        background: #252526; padding: 14px 18px;
+        border-bottom: 1px solid #3c3c3c;
+    }
+    .gen-panel-header span { color: #4ec9b0; font-weight: 700; font-size: 14px; }
+    .gen-panel-body { padding: 16px; }
+    .gen-label { color: #f3ebeb; font-size: 12px; margin-bottom: 5px; display: block; }
+    .gen-select {
+        width: 100%; padding: 8px 10px; background: #b2b2c8; color: black;
+        border: 1px solid #b27272; border-radius: 6px; font-size: 13px; margin-bottom: 12px;
+    }
+    .gen-btn {
+        width: 100%; padding: 10px; background: #180c96; color: white;
+        border: none; border-radius: 6px; font-size: 13px; font-weight: 700;
+        cursor: pointer; transition: background 0.2s;
+    }
+    .gen-btn:hover { background: #6d28d9; }
+    .gen-loader { color: #888; font-size: 12px; text-align: center; margin-top: 10px; display: none; }
+    .gen-output {
+        background: #2d2d2d; border: 1px solid #3c3c3c; border-radius: 8px;
+        padding: 12px; margin-top: 14px; display: none;
+    }
+    .gen-q-title { color: #4ec9b0; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .gen-q-desc { color: #ab0e0e; font-size: 12px; line-height: 1.6; max-height: 100px; overflow-y: auto; }
+    .gen-q-meta { color: #888; font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #3c3c3c; line-height: 1.6; }
+    .copy-btn {
+        width: 100%; margin-top: 10px; padding: 9px; background: #2d6a2d;
+        color: white; border: none; border-radius: 6px; font-size: 13px;
+        font-weight: 700; cursor: pointer;
+    }
+    .copy-btn:hover { background: #3d8a3d; }
+    .copy-success { color: #4ec9b0; font-size: 12px; text-align: center; margin-top: 8px; display: none; }
+
+    @media (max-width: 768px) {
+        .page-wrapper { flex-direction: column; }
+        .gen-panel { width: 100%; position: static; }
+    }
 </style>
 </head>
 <body>
-<div class="container">
-    <h2>Schedule Interview</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Generate Secret Link</button>
-    </form>
+<div class="page-wrapper">
+
+    <!-- ── Left: Main Form ── -->
+    <div class="container">
+        <div style="text-align: right; margin-bottom: 14px;">
+            <span style="color:#555; font-size:14px;">👋 {{ request.session.interviewer_name }}</span>
+            <a href="{% url 'schedule_interview:interviewer_logout' %}" 
+               style="margin-left: 12px; background: #dc2626; color: white; padding: 7px 14px; border-radius: 8px; text-decoration: none; font-size: 13px;">
+                Logout
+            </a>
+        </div>
+
+        <h2>Schedule Interview</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div>
+                <label>Candidate Name</label>
+                {{ form.candidate_name }}
+                {{ form.candidate_name.errors }}
+            </div>
+            <div>
+                <label>Candidate Email</label>
+                {{ form.candidate_email }}
+                {{ form.candidate_email.errors }}
+            </div>
+            <div>
+                <label>Interviewer Name</label>
+                {{ form.interviewer_name }}
+                {{ form.interviewer_name.errors }}
+            </div>
+            <div>
+                <label>AI System Prompt</label>
+                {{ form.system_prompt }}
+                {{ form.system_prompt.errors }}
+            </div>
+            <div>
+                <label>Interview Date & Time</label>
+                {{ form.interview_datetime }}
+                {{ form.interview_datetime.errors }}
+            </div>
+            <div>
+                <label>Link Expiration (optional)</label>
+                {{ form.expires_at }}
+                {{ form.expires_at.errors }}
+            </div>
+            <div>
+                <label>Coding Question <span style="color:#6b7280; font-weight:400; font-size:12px;">(generate from right panel →)</span></label>
+                {{ form.coding_question }}
+                {{ form.coding_question.errors }}
+            </div>
+
+            <!-- Hidden fields — JS se fill honge -->
+            <div style="display:none;">
+                {{ form.coding_topic }}
+                {{ form.coding_difficulty }}
+                {{ form.coding_language }}
+            </div>
+
+            <button type="submit">🔗 Generate Secret Link</button>
+        </form>
+    </div>
+
+    <!-- ── Right: Generator Panel ── -->
+    <div class="gen-panel">
+        <div class="gen-panel-header">
+            <span> AI Question Generator</span>
+        </div>
+        <div class="gen-panel-body">
+            <label class="gen-label">Topic</label>
+            <select class="gen-select" id="gen-topic">
+                <option>Arrays</option>
+                <option>Strings</option>
+                <option>Linked Lists</option>
+                <option>Dynamic Programming</option>
+                <option>Trees</option>
+                <option>Sorting</option>
+                <option>Recursion</option>
+            </select>
+
+            <label class="gen-label">Difficulty</label>
+            <select class="gen-select" id="gen-difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <label class="gen-label">Language</label>
+            <select class="gen-select" id="gen-language">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+            </select>
+
+            <button class="gen-btn" onclick="generateQuestion()"> Generate</button>
+            <div class="gen-loader" id="gen-loader"> Generating...</div>
+
+            <div class="gen-output" id="gen-output">
+                <div class="gen-q-title" id="gen-title"></div>
+                <div class="gen-q-desc" id="gen-desc"></div>
+                <div class="gen-q-meta" id="gen-meta"></div>
+                <button class="copy-btn" onclick="copyToField()">📋 Copy to Field</button>
+                <div class="copy-success" id="copy-success">✅ Copied!</div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<script>
+    let generatedQuestion = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        document.cookie.split(';').forEach(c => {
+            c = c.trim();
+            if (c.startsWith(name + '=')) cookieValue = decodeURIComponent(c.split('=')[1]);
+        });
+        return cookieValue;
+    }
+
+    async function generateQuestion() {
+        document.getElementById('gen-loader').style.display = 'block';
+        document.getElementById('gen-output').style.display = 'none';
+        document.getElementById('copy-success').style.display = 'none';
+
+        const topic = document.getElementById('gen-topic').value;
+        const difficulty = document.getElementById('gen-difficulty').value;
+        const language = document.getElementById('gen-language').value;
+
+        const response = await fetch('/code/generate-question/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify({ topic, difficulty, language })
+        });
+
+        const result = await response.json();
+        generatedQuestion = result.question;
+
+        document.getElementById('gen-loader').style.display = 'none';
+        document.getElementById('gen-output').style.display = 'block';
+        document.getElementById('gen-title').innerText = result.question.title;
+        document.getElementById('gen-desc').innerText = result.question.description;
+        document.getElementById('gen-meta').innerHTML = 
+            `<b style="color:#ccc">Input:</b> ${result.question.example_input}<br>
+             <b style="color:#ccc">Output:</b> ${result.question.example_output}<br>
+             <b style="color:#ccc">Constraints:</b> ${result.question.constraints}`;
+
+        // Hidden fields auto-fill
+        document.getElementById('id_coding_topic').value = topic;
+        document.getElementById('id_coding_difficulty').value = difficulty;
+        document.getElementById('id_coding_language').value = language;
+    }
+
+    function copyToField() {
+        if (!generatedQuestion) return;
+        const fullText = 
+            `${generatedQuestion.title}\n\n` +
+            `${generatedQuestion.description}\n\n` +
+            `Example Input: ${generatedQuestion.example_input}\n` +
+            `Example Output: ${generatedQuestion.example_output}\n` +
+            `Constraints: ${generatedQuestion.constraints}`;
+
+        document.getElementById('id_coding_question').value = fullText;
+        document.getElementById('copy-success').style.display = 'block';
+        setTimeout(() => document.getElementById('copy-success').style.display = 'none', 2000);
+    }
+</script>
 </body>
 </html>

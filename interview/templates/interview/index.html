@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +28,47 @@
         }
 
         h2 { text-align: center; color: #333; margin-bottom: 10px; }
+
+        .recording-indicator {
+            display: none;
+            background: #dc2626;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .recording-indicator.active { display: block; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .timer-display {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        .timer-display.active { display: block; }
+        .timer-display.warning {
+            background: #fee2e2;
+            color: #dc2626;
+            animation: timerWarn 0.8s ease-in-out infinite;
+        }
+
+        @keyframes timerWarn {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .section { display: flex; flex-direction: column; gap: 6px; }
+
         .box {
             background: #f4f6f8;
             padding: 14px 16px;
@@ -40,25 +81,126 @@
             border: 1px solid #e5e7eb;
         }
 
-        .button-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-        button { padding: 10px 18px; font-size: 14px; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .box.listening {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            animation: borderPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { border-color: #3b82f6; }
+            50% { border-color: #60a5fa; }
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
         button.primary { background: #2563eb; color: white; }
+        button.primary:hover:not(:disabled) { background: #1d4ed8; }
         button.success { background: #16a34a; color: white; }
+        button.success:hover:not(:disabled) { background: #15803d; }
         button.danger { background: #dc2626; color: white; }
+        button.danger:hover:not(:disabled) { background: #b91c1c; }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
+
         audio { width: 100%; margin-top: 5px; border-radius: 8px; }
         .label { font-weight: 600; color: #111827; }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+        }
+        .error-message.active { display: block; }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.50);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 36px 32px 28px;
+            width: 380px;
+            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: modalPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.85) translateY(16px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-icon { font-size: 42px; margin-bottom: 12px; }
+        .modal h3 { font-size: 18px; color: #111827; margin-bottom: 8px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .modal p { font-size: 14px; color: #6b7280; line-height: 1.6; margin-bottom: 24px; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+        .modal-btns button { flex: 1; padding: 10px 16px; }
+        .modal-btn-yes { background: #7c3aed; color: white; }
+        .modal-btn-yes:hover { background: #6d28d9; }
+        .modal-btn-no { background: #f3f4f6; color: #374151; }
+        .modal-btn-no:hover { background: #e5e7eb; }
     </style>
 </head>
 <body>
-    <body>
+
+<!-- WARNING MODAL -->
+<div class="modal-overlay" id="warningModal">
+    <div class="modal">
+        <div class="modal-icon" id="modalIcon">⚠️</div>
+        <h3 id="modalTitle">Move to Coding Round?</h3>
+        <p id="modalDesc">Are you sure you want to end the interview and proceed to the Coding Round?</p>
+        <div class="modal-btns">
+            <button class="modal-btn-no" id="modalNo">Stay Here</button>
+            <button class="modal-btn-yes" id="modalYes">Yes, Proceed →</button>
+        </div>
+    </div>
+</div>
 
 <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 
 <div class="container">
 
+    <h2> AI Interviewer</h2>
 
-    <h2>AI Interviewer</h2>
+    <div class="recording-indicator" id="recordingIndicator">
+         Video Recording in Progress
+    </div>
+
+    <div class="timer-display" id="timerDisplay">
+        ⏱ Time remaining: <span id="timeLeft">0:20</span>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
 
     <div class="section">
         <span class="label">INTERVIEWER:</span>
@@ -74,199 +216,316 @@
         <button id="startBtn" class="primary">Start Interview</button>
         <button id="recordBtn" class="success" disabled>Start Answer</button>
         <button id="doneBtn" class="danger" disabled>Done</button>
+        <button id="endBtn" class="danger" disabled>End Interview</button>
+        <button id="nextRoundBtn" class="primary" style="background:#7c3aed; display:none;">➡ Next Round</button>
     </div>
 
     <audio id="audioPlayer" controls></audio>
 </div>
 
 <script>
-    function getCSRFToken() {
+function getCSRFToken() {
     return document.getElementById("csrfToken").value;
 }
+
 document.addEventListener("DOMContentLoaded", () => {
 
-    let mediaRecorder, audioChunks = [], streamRef, timeout;
+    const INTERVIEW_TIMEOUT = 120000;
+    const WARNING_AT        = 10000;
+
+    let timeout, timerInterval;
+    let timeRemaining = INTERVIEW_TIMEOUT;
     let videoStream, videoRecorder, videoChunks = [];
+    let finalTranscript = "";
+    let isRecognitionActive = false;
+    let doneClicked = false;
+    let interviewEnded = false;
 
-    const aiTextEl = document.getElementById("aiText");
-    const userTextEl = document.getElementById("userText");
-    const audioPlayer = document.getElementById("audioPlayer");
-    const startBtn = document.getElementById("startBtn");
-    const recordBtn = document.getElementById("recordBtn");
-    const doneBtn = document.getElementById("doneBtn");
+    const aiTextEl           = document.getElementById("aiText");
+    const userTextEl         = document.getElementById("userText");
+    const audioPlayer        = document.getElementById("audioPlayer");
+    const startBtn           = document.getElementById("startBtn");
+    const recordBtn          = document.getElementById("recordBtn");
+    const doneBtn            = document.getElementById("doneBtn");
+    const endBtn             = document.getElementById("endBtn");
+    const nextRoundBtn       = document.getElementById("nextRoundBtn");
+    const recordingIndicator = document.getElementById("recordingIndicator");
+    const timerDisplay       = document.getElementById("timerDisplay");
+    const timeLeftEl         = document.getElementById("timeLeft");
+    const errorMessage       = document.getElementById("errorMessage");
+    const warningModal       = document.getElementById("warningModal");
+    const modalIcon          = document.getElementById("modalIcon");
+    const modalTitle         = document.getElementById("modalTitle");
+    const modalDesc          = document.getElementById("modalDesc");
+    const modalYes           = document.getElementById("modalYes");
+    const modalNo            = document.getElementById("modalNo");
 
-    // ------------- TIMER -------------
+    // MODAL
+    function showWarningModal(reason) {
+        if (reason === "timer") {
+            modalIcon.textContent  = "⏰";
+            modalTitle.textContent = "Time's Up!";
+            modalDesc.textContent  = "Your answer time has ended. Would you like to proceed to the Coding Round?";
+        } else {
+            modalIcon.textContent  = "⚠️";
+            modalTitle.textContent = "Move to Coding Round?";
+            modalDesc.textContent  = "Are you sure you want to end the interview and proceed to the Coding Round?";
+        }
+        warningModal.classList.add("active");
+    }
+
+    function hideModal() {
+        warningModal.classList.remove("active");
+    }
+
+    modalNo.addEventListener("click", () => {
+        hideModal();
+        if (!interviewEnded) {
+            startTimer();
+            recordBtn.disabled = false;
+        }
+    });
+
+    modalYes.addEventListener("click", async () => {
+        hideModal();
+        showNextRound();
+        await finalizeInterview();
+        showNextRound();
+    });
+
+    function showNextRound() {
+        nextRoundBtn.style.display = "block";
+        recordBtn.disabled = true;
+        doneBtn.disabled   = true;
+        endBtn.disabled    = true;
+        startBtn.disabled  = true;
+    }
+
+    nextRoundBtn.addEventListener("click", () => {
+        if (confirm("Proceed to Coding Round?")) {
+            window.location.href = '/code/start-from-session/';
+        }
+    });
+
+    async function finalizeInterview() {
+        if (interviewEnded) return;
+        interviewEnded = true;
+        clearTimer();
+        if (isRecognitionActive) { recognition.stop(); isRecognitionActive = false; }
+        try {
+            await fetch("/interview/end/", { method: "POST", headers: { "X-CSRFToken": getCSRFToken() } });
+        } catch(e) { console.warn("End call failed", e); }
+        await stopVideoRecording();
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.add("active");
+        setTimeout(() => errorMessage.classList.remove("active"), 5000);
+    }
+
+    // TIMER
     function startTimer() {
         clearTimeout(timeout);
-        timeout = setTimeout(async () => {
-            aiTextEl.innerText = "Ok, your interview is over. Thank you for your time.";
-            recordBtn.disabled = true;
-            doneBtn.disabled = true;
-            await stopVideoRecording();
-        }, 10000); // 30s inactivity
-    }
-    function clearTimer() { clearTimeout(timeout); }
+        clearInterval(timerInterval);
+        timeRemaining = INTERVIEW_TIMEOUT;
+        timerDisplay.classList.add("active");
+        timerDisplay.classList.remove("warning");
+        updateTimerDisplay();
 
-    // ------------- PLAY AI AUDIO -------------
+        timerInterval = setInterval(() => {
+            timeRemaining -= 1000;
+            updateTimerDisplay();
+            if (timeRemaining <= WARNING_AT) timerDisplay.classList.add("warning");
+        }, 1000);
+
+        timeout = setTimeout(() => {
+            clearInterval(timerInterval);
+            timerDisplay.classList.remove("active", "warning");
+            if (isRecognitionActive) { recognition.stop(); isRecognitionActive = false; }
+            showWarningModal("timer");
+        }, INTERVIEW_TIMEOUT);
+    }
+
+    function clearTimer() {
+        clearTimeout(timeout);
+        clearInterval(timerInterval);
+        timerDisplay.classList.remove("active", "warning");
+    }
+
+    function updateTimerDisplay() {
+        const m = Math.floor(timeRemaining / 60000);
+        const s = Math.floor((timeRemaining % 60000) / 1000);
+        timeLeftEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // AUDIO
     async function playAIAudio(url) {
         return new Promise(resolve => {
             audioPlayer.src = url;
-            audioPlayer.play().catch(err => console.warn("Audio autoplay blocked:", err));
+            audioPlayer.play().catch(err => {
+                console.error("Audio playback failed:", err);
+                showError("Audio playback failed. Please check your audio settings.");
+            });
             audioPlayer.onended = () => { startTimer(); resolve(); };
         });
     }
 
-    // ------------- VIDEO RECORDING -------------
+    // VIDEO
     async function startVideoRecording() {
         try {
             videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            videoRecorder = new MediaRecorder(videoStream);
+            videoRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm;codecs=vp8,opus' });
             videoChunks = [];
-            videoRecorder.ondataavailable = e => { if(e.data.size>0) videoChunks.push(e.data); };
+            videoRecorder.ondataavailable = e => { if (e.data.size > 0) videoChunks.push(e.data); };
             videoRecorder.start();
-            console.log("Video recording started...");
-        } catch(err) {
+            recordingIndicator.classList.add("active");
+        } catch (err) {
             console.error("Video recording failed:", err);
+            showError("Camera access denied. Please enable camera permissions.");
         }
     }
 
     async function stopVideoRecording() {
-        if(!videoRecorder || videoRecorder.state === "inactive") return;
+        if (!videoRecorder || videoRecorder.state === "inactive") return;
         return new Promise(resolve => {
             videoRecorder.onstop = async () => {
-    videoStream.getTracks().forEach(t => t.stop());
-    const blob = new Blob(videoChunks, { type: "video/webm" });
-
-    const form = new FormData();
-    form.append('file', blob, `interview_${Date.now()}.webm`);
-    form.append('upload_preset', 'ai_interview');
-
-    const cloudName = 'dmirffn2y';
-    const url = `https://api.cloudinary.com/v1_1/dmirffn2y/auto/upload`;
-
-    try {
-        const res = await fetch(url, { method: "POST", body: form });
-        const data = await res.json();
-        console.log("Video uploaded:", data.secure_url);
-    } catch(err) {
-        console.error("Cloudinary upload failed:", err);
-    }
-
-    resolve();
-};
+                videoStream.getTracks().forEach(t => t.stop());
+                recordingIndicator.classList.remove("active");
+                const blob = new Blob(videoChunks, { type: "video/webm" });
+                const form = new FormData();
+                form.append("file", blob, `interview_${Date.now()}.webm`);
+                form.append("upload_preset", "ai_interview");
+                try {
+                    const uploadRes = await fetch("https://api.cloudinary.com/v1_1/dmirffn2y/auto/upload", { method: "POST", body: form });
+                    if (!uploadRes.ok) showError("Video upload failed. Your interview may not be saved.");
+                } catch (err) { showError("Network error during video upload."); }
+                resolve();
+            };
             videoRecorder.stop();
         });
     }
 
-    // ------------- START INTERVIEW -------------
+    // START INTERVIEW
     startBtn.addEventListener("click", async () => {
-        aiTextEl.innerText = "AI is starting...";
+        aiTextEl.innerText = " AI is preparing your first question...";
         userTextEl.innerText = "";
-        recordBtn.disabled = true;
-        doneBtn.disabled = true;
+        startBtn.disabled = true; recordBtn.disabled = true;
+        doneBtn.disabled = true; endBtn.disabled = true;
 
         try {
-           const res = await fetch("/start/", {
-    method: "POST",
-    headers: {
-        "X-CSRFToken": getCSRFToken()
-    }
-});
-            const data = await res.json();
-
+            const response = await fetch('/interview/start/', { method: "POST", headers: { "X-CSRFToken": getCSRFToken() } });
+            if (!response.ok) throw new Error("Failed to start interview");
+            const data = await response.json();
             aiTextEl.innerText = data.ai_text || "[No response]";
-            localStorage.setItem("session_key", data.session_key);
-
             await startVideoRecording();
-
-            const audioURL = `/tts_audio?text=${encodeURIComponent(data.ai_text)}`;
+            const audioURL = `/interview/tts/?text=${encodeURIComponent(data.ai_text)}`;
             await playAIAudio(audioURL);
-
-            recordBtn.disabled = false;
-            doneBtn.disabled = false;
-            startTimer();
-        } catch(err) {
-            console.error(err);
+            recordBtn.disabled = false; doneBtn.disabled = false; endBtn.disabled = false;
+        } catch (err) {
+            console.error("Interview start error:", err);
             aiTextEl.innerText = "Error starting interview.";
+            showError("Failed to start interview. Please try again.");
+            startBtn.disabled = false;
         }
     });
 
-    // ------------- RECORD AUDIO -------------
-    recordBtn.addEventListener("click", async () => {
+    // END INTERVIEW (manual)
+    endBtn.addEventListener("click", () => {
         clearTimer();
-        userTextEl.innerText = "Recording...";
-        recordBtn.disabled = true;
-        doneBtn.disabled = false;
+        showWarningModal("manual");
+    });
 
-        try {
-            streamRef = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(streamRef);
-            audioChunks = [];
-            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            mediaRecorder.start();
-        } catch(err) {
-            console.error(err);
-            userTextEl.innerText = "Cannot access microphone.";
-            recordBtn.disabled = false;
+    // SPEECH
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) { showError("Speech Recognition not supported. Please use Chrome browser."); startBtn.disabled = true; }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    recognition.onstart = () => {
+        finalTranscript = ""; isRecognitionActive = true;
+        userTextEl.classList.add("listening");
+    };
+
+    recognition.onresult = (event) => {
+        let interimTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            let transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) finalTranscript += transcript + " ";
+            else interimTranscript += transcript;
+        }
+        userTextEl.innerText = finalTranscript + interimTranscript;
+    };
+
+    recognition.onerror = (event) => {
+        isRecognitionActive = false; userTextEl.classList.remove("listening");
+        if (event.error === "no-speech") userTextEl.innerText = "No speech detected. Please try again.";
+        else { userTextEl.innerText = "Speech recognition failed: " + event.error; showError("Speech recognition error: " + event.error); }
+        recordBtn.disabled = false; doneBtn.disabled = false;
+    };
+
+    recordBtn.addEventListener("click", () => {
+        clearTimer();
+        userTextEl.innerText = "🎤 Listening...";
+        userTextEl.classList.add("listening");
+        recordBtn.disabled = true; doneBtn.disabled = false;
+        if (!isRecognitionActive) {
+            try { recognition.start(); }
+            catch (err) { showError("Failed to start speech recognition."); userTextEl.classList.remove("listening"); recordBtn.disabled = false; }
         }
     });
 
-    // ------------- STOP AUDIO & SEND TO AI -------------
-    doneBtn.addEventListener("click", async () => {
+    doneBtn.addEventListener("click", () => {
+        doneClicked = true;  
         doneBtn.disabled = true;
-        if(!mediaRecorder) return;
-
-        mediaRecorder.stop();
-        mediaRecorder.onstop = async () => {
-            streamRef.getTracks().forEach(t => t.stop());
-            const blob = new Blob(audioChunks, { type: "audio/webm" });
-
-            if(blob.size < 1000) {
-                userTextEl.innerText = "[No speech detected]";
-                recordBtn.disabled = false;
-                doneBtn.disabled = false;
-                return;
-            }
-
-            // Transcribe
-            let candidateAnswer = "[Transcription failed]";
-            try {
-                const form = new FormData();
-                form.append("audio_file", blob);
-                 const res = await fetch("/transcribe/", {
-    method: "POST",
-    headers: {
-        "X-CSRFToken": getCSRFToken()
-    },
-    body: form
-});
-                const data = await res.json();
-                candidateAnswer = data.text || "[No transcription]";
-                userTextEl.innerText = candidateAnswer;
-            } catch (err) { console.error("Transcription error:", err); }
-
-            // Send to AI
-            try {
-                const res2 = await fetch("/interview/", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": getCSRFToken()
-    },
-    body: `audio_text=${encodeURIComponent(candidateAnswer)}`
-});
-                const aiData = await res2.json();
-                aiTextEl.innerText = aiData.ai_text || "[No response]";
-
-                const audioURL = `/tts_audio?text=${encodeURIComponent(aiData.ai_text)}`;
-                await playAIAudio(audioURL);
-            } catch(err) { console.error("AI response error:", err); }
-
-            recordBtn.disabled = false;
-            doneBtn.disabled = false;
-            startTimer();
-        };
+        userTextEl.classList.remove("listening");
+        if (isRecognitionActive) recognition.stop();
     });
+
+   recognition.onend = async () => {
+    isRecognitionActive = false;
+    userTextEl.classList.remove("listening");
+
+    // ✅ Agar Done click nahi hua toh mic restart karo
+    if (!doneClicked) {
+        if (!interviewEnded) {
+            try { recognition.start(); isRecognitionActive = true; } 
+            catch(e) {}
+        }
+        return;
+    }
+
+    // Done click ke baad wala baaki code same rehga
+    doneClicked = false;
+    if (!finalTranscript.trim()) {
+        userTextEl.innerText = "No speech detected. Please click 'Start Answer' and speak clearly.";
+        recordBtn.disabled = false; doneBtn.disabled = false;
+        return;
+    }
+    try {
+        aiTextEl.innerText = "⏳ AI is thinking...";
+        const res = await fetch("/interview/continue/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ audio_text: finalTranscript })
+        });
+        if (!res.ok) throw new Error("Failed to get AI response");
+        const aiData = await res.json();
+        aiTextEl.innerText = aiData.ai_text || "[No response]";
+        finalTranscript = "";
+        recordBtn.disabled = false; doneBtn.disabled = false;
+        if (aiData.is_complete) { showWarningModal("manual"); return; }
+        const audioURL = `/interview/tts/?text=${encodeURIComponent(aiData.ai_text)}`;
+        await playAIAudio(audioURL);
+    } catch (err) {
+        showError("Failed to get AI response. Please try again.");
+        aiTextEl.innerText = "Error processing your answer. Please try again.";
+        recordBtn.disabled = false; doneBtn.disabled = false;
+    }
+};
 
 });
 </script>

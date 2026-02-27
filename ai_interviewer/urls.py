@@ -14,17 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
 # ai_interviewer/urls.py
-from django.conf import settings
-from django.conf.urls.static import static
+
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView  # ✅ Add this import
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', include('interview.urls')),
-    path('schedule_interview/', include('schedule_interview.urls')),  
-     
+    path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(url='/schedule/', permanent=False)),  # Move this to the top
+    path('schedule/', include('schedule_interview.urls')),
+    path('interview/', include('interview.urls')),
+    path('code/', include('code_editor.urls')),
+    
 ]
 
 if settings.DEBUG:

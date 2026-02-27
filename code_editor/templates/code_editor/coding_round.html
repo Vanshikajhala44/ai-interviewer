@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Coding Round</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #1e1e1e; color: white; height: 100vh; display: flex; flex-direction: column; }
+    .navbar { background: #252526; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3c3c3c; }
+    .navbar span { color: #4ec9b0; font-weight: bold; }
+    .timer { color: #f59e0b; font-family: monospace; font-size: 18px; }
+    .main { display: flex; flex: 1; overflow: hidden; }
+    .question-panel { width: 35%; background: #252526; padding: 20px; overflow-y: auto; border-right: 1px solid #3c3c3c; }
+    .question-panel h2 { color: #4ec9b0; margin-bottom: 10px; font-size: 16px; }
+    .question-panel p { color: #ccc; font-size: 14px; line-height: 1.7; }
+    .badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 11px; margin-bottom: 12px; font-weight: bold; }
+    .easy { background: #2d6a2d; color: #4ec94e; }
+    .medium { background: #6a4f2d; color: #c9a04e; }
+    .hard { background: #6a2d2d; color: #c94e4e; }
+    .example-box { background: #1e1e1e; padding: 12px; border-radius: 6px; margin-top: 12px; font-family: monospace; font-size: 13px; color: #ccc; border: 1px solid #3c3c3c; }
+    .example-box strong { color: #4ec9b0; }
+    .editor-panel { flex: 1; display: flex; flex-direction: column; }
+    .editor-toolbar { background: #2d2d2d; padding: 8px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #3c3c3c; }
+    .editor-toolbar select { background: #3c3c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    .editor-toolbar span { color: #ccc; font-size: 13px; }
+    #editor { flex: 1; min-height: 300px; }
+    .stdin-panel { background: #2d2d2d; padding: 8px 15px; border-top: 1px solid #3c3c3c; }
+    .stdin-panel span { color: #ccc; font-size: 13px; }
+    .stdin-panel input { width: 100%; margin-top: 5px; padding: 6px 10px; background: #3c3c3c; color: white; border: none; border-radius: 4px; font-family: monospace; font-size: 13px; }
+    .output-panel { height: 180px; background: #1e1e1e; border-top: 1px solid #3c3c3c; display: flex; flex-direction: column; }
+    .output-toolbar { background: #252526; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3c3c3c; }
+    .output-toolbar span { color: #ccc; font-size: 13px; }
+    #output-box { padding: 12px 15px; font-family: monospace; font-size: 13px; color: #d4d4d4; overflow-y: auto; flex: 1; }
+    .btn { padding: 7px 18px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-run { background: #3c3c3c; color: white; }
+    .btn-run:hover { background: #4c4c4c; }
+    .btn-submit { background: #2d6a2d; color: white; }
+    .btn-submit:hover { background: #3d8a3d; }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <span>Coding Round</span>
+    <span class="timer">Time: <span id="timer">45:00</span></span>
+  </div>
+
+  <div class="main">
+
+    <div class="question-panel">
+      <h2>{{ question.title }}</h2>
+      <span class="badge {{ question.difficulty }}">{{ question.difficulty|title }}</span>
+      <p>{{ question.description }}</p>
+      {% comment %} <div class="example-box">
+        <strong>Example Input:</strong><br>{{ question.example_input }}<br><br>
+        <strong>Example Output:</strong><br>{{ question.example_output }}
+      </div> {% endcomment %}
+      {% comment %} <div class="example-box" style="margin-top:10px;">
+        <strong>Constraints:</strong><br>{{ question.constraints }}
+      </div> {% endcomment %}
+    </div>
+
+    <div class="editor-panel">
+
+      <div class="editor-toolbar">
+        <span>Language:</span>
+        <select id="language-select" onchange="changeLanguage()">
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+          <option value="cpp">C++</option>
+        </select>
+      </div>
+
+      <div id="editor"></div>
+
+      <div class="stdin-panel">
+        <span>Input / stdin (optional):</span>
+        <input id="stdin-input" type="text" placeholder="e.g. [1,2,3,4,5]">
+      </div>
+
+      <div class="output-panel">
+        <div class="output-toolbar">
+          <span>Output</span>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-run" onclick="runCode()">Run</button>
+            <button class="btn btn-submit" onclick="submitCode()">Submit</button>
+          </div>
+        </div>
+        <pre id="output-box">// Output will appear here...</pre>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <script>
+    let editor;
+
+    const starterCode = {
+      python: '# Write your solution here\ndef solution():\n    pass\n',
+      javascript: '// Write your solution here\nfunction solution() {\n    \n}\n',
+      java: 'public class Solution {\n    public static void main(String[] args) {\n        \n    }\n}\n',
+      cpp: '#include<iostream>\nusing namespace std;\nint main() {\n    \n    return 0;\n}\n'
+    };
+
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
+    require(['vs/editor/editor.main'], function () {
+      editor = monaco.editor.create(document.getElementById('editor'), {
+        value: starterCode['python'],
+        language: 'python',
+        theme: 'vs-dark',
+        fontSize: 14,
+        minimap: { enabled: false },
+        automaticLayout: true,
+      });
+    });
+
+    function changeLanguage() {
+      const lang = document.getElementById('language-select').value;
+      monaco.editor.setModelLanguage(editor.getModel(), lang);
+      editor.setValue(starterCode[lang]);
+    }
+
+    function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(c => {
+        c = c.trim();
+        if (c.startsWith(name + '=')) cookieValue = decodeURIComponent(c.split('=')[1]);
+      });
+      return cookieValue;
+    }
+
+    async function runCode() {
+      const code = editor.getValue();
+      const language = document.getElementById('language-select').value;
+      const stdin = document.getElementById('stdin-input').value;
+      document.getElementById('output-box').innerText = 'Running...';
+
+      const response = await fetch('/code/run/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+        body: JSON.stringify({ code, language, stdin })
+      });
+
+      const result = await response.json();
+      document.getElementById('output-box').innerText = result.output || result.stderr || 'No output';
+    }
+
+  // Submit duplicate rokne ke liye
+let isSubmitted = false;
+
+async function submitCode() {
+  if (isSubmitted) return;  // ← double submit block
+  isSubmitted = true;
+
+  const code = editor.getValue();
+  const language = document.getElementById('language-select').value;
+  const output = document.getElementById('output-box').innerText;
+  const questionId = "{{ question.id }}";
+
+  const response = await fetch('/code/submit/', {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json', 
+      'X-CSRFToken': getCookie('csrftoken') 
+    },
+    body: JSON.stringify({ code, language, output, question_id: questionId })
+  });
+
+  const result = await response.json();
+  if (result.success) {
+    window.location.href = result.redirect;
+  } else {
+    isSubmitted = false;  // error aaye toh dobara try kar sake
+    alert("Submission failed: " + result.error);
+  }
+}
+
+// Timer fix — clearInterval karo submit ke baad
+const timerInterval = setInterval(() => {
+  timeLeft--;
+  const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const secs = String(timeLeft % 60).padStart(2, '0');
+  document.getElementById('timer').innerText = mins + ':' + secs;
+  
+  
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);  // ← timer band karo
+    alert('Time is up! Auto submitting...');
+    submitCode();
+  }
+}, 1000);
+  </script>
+
+</body>
+
+</html>

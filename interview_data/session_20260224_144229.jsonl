@@ -1,0 +1,17 @@
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "What is Python and why is it popular?", "timestamp": "2026-02-24T14:42:35.843643"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "Rajasthani language and we can integrate it with AI", "timestamp": "2026-02-24T14:43:26.581330", "score": 2, "total_score": 2}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "What is Python and why is it popular?", "timestamp": "2026-02-24T14:43:40.064141"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "item is popular because it has like easy Syntax and animal can learn it and we can import multiple libraries", "timestamp": "2026-02-24T14:44:00.616160", "score": 5, "total_score": 7}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "Explain Python data types.", "timestamp": "2026-02-24T14:44:09.242930"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "Python have multiple data type like a set double string", "timestamp": "2026-02-24T14:44:25.684235", "score": 3, "total_score": 10}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "Explain Python data types.", "timestamp": "2026-02-24T14:44:28.924174"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "Python have a multiple data types like set string tuple list", "timestamp": "2026-02-24T14:44:48.823687", "score": 3, "total_score": 13}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "What is Django and why use it?", "timestamp": "2026-02-24T14:44:54.790312"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "we use Django for web development in Python", "timestamp": "2026-02-24T14:45:08.952528", "score": 4, "total_score": 17}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "Explain Django models and migrations.", "timestamp": "2026-02-24T14:45:14.181948"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "physically used Tango models for integrating a database and migration like for changing the database", "timestamp": "2026-02-24T14:45:32.016513", "score": 2, "total_score": 19}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "Explain Django models and migrations.", "timestamp": "2026-02-24T14:45:36.165891"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "Django models are used for integrating our database backend and jenko migration are used for changing a database and we have to command then go Management by", "timestamp": "2026-02-24T14:46:00.664264", "score": 6, "total_score": 25}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "How do you handle forms in Django?", "timestamp": "2026-02-24T14:46:05.243266"}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "candidate", "content": "we can handle forms in Django by making founded by height", "timestamp": "2026-02-24T14:46:26.919750", "score": 3, "total_score": 28}
+{"session": "ip7qr147hdr6j9ik0kbzn32gvpsexfmh", "role": "ai", "content": "What is Django ORM? Give an example.", "timestamp": "2026-02-24T14:46:31.191039"}

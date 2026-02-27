@@ -1,11 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview Scheduled</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .info p {
+            margin: 10px 0;
+            color: #555;
+        }
+        .link-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        .link-box a {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body>
-    <h2>Interview Scheduled Successfully!</h2>
-    <p>Share this link with the candidate:</p>
-    <a href="{{ link }}">{{ link }}</a>
+    <div class="container">
+        <h2> Interview Scheduled Successfully!</h2>
+        
+        <div class="info">
+            <p><strong>Candidate:</strong> {{ interview.candidate_name }}</p>
+            <p><strong>Email:</strong> {{ interview.candidate_email }}</p>
+            <p><strong>Interviewer:</strong> {{ interview.interviewer_name }}</p>
+            <p><strong>Date & Time:</strong> {{ interview.interview_datetime }}</p>
+        </div>
+
+        <div class="link-box">
+            <p><strong>Interview Link:</strong></p>
+            <a href="{{ interview_link }}" target="_blank">{{ interview_link }}</a>
+        </div>
+
+        <p style="color: #666; margin: 20px 0;">
+            Share this link with the candidate to start the interview.
+        </p>
+
+        <button onclick="copyLink()"> Copy Link</button>
+        <button onclick="location.href='{% url 'schedule_interview:schedule_interview' %}'">Schedule Another Interview</button>
+    </div>
+
+    <script>
+        function copyLink() {
+            const link = "{{ interview_link }}";
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Link copied to clipboard! ');
+            });
+        }
+    </script>
 </body>
 </html>

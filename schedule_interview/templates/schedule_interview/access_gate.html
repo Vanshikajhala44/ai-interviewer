@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interviewer Access</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1c6073, #fef6fb);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+    .container {
+        background: #fff;
+        padding: 40px 35px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        text-align: center;
+    }
+    h2 { color: #333; margin-bottom: 15px; }
+    p { color: #666; margin-bottom: 25px; }
+    input[type="password"] {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+        letter-spacing: 2px;
+        font-family: 'Courier New', monospace;
+    }
+    input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    button {
+        width: 100%;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    button:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+    }
+    .error {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+    }
+    .error.show { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2> Interviewer Access</h2>
+    <p>Enter your access key to schedule interviews</p>
+    
+    <div class="error" id="errorMsg">Invalid access key. Please try again.</div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <input 
+            type="password" 
+            name="access_key" 
+            placeholder="Enter Access Key" 
+            required 
+            autofocus
+        >
+        <button type="submit">Access Dashboard</button>
+    </form>
+</div>
+
+{% if error %}
+<script>
+    document.getElementById('errorMsg').classList.add('show');
+</script>
+{% endif %}
+</body>
+</html>

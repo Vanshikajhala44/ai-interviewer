@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "interview",
     "schedule_interview",
+    "code_editor",
 
 ]
 
@@ -138,6 +139,7 @@ import os
 load_dotenv()
 
 print("Loaded GROQ KEY:", os.getenv("GROQ_API_KEY"))
+GROQ_API_KEY2 = os.getenv("GROQ_API_KEY2")
 import cloudinary
 import os
 
@@ -149,3 +151,19 @@ cloudinary.config(
 )
 
 
+EMAIL_HOST_PASSWORD ='oavv ikpj grij omhl'
+EMAIL_HOST_USER = 'vanshikajhla009@gmail.com'
+DEFAULT_FROM_EMAIL = 'vanshikajhla009@gmail.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+JDOODLE_CLIENT_ID = os.getenv("JDOODLE_CLIENT_ID")
+JDOODLE_CLIENT_SECRET = os.getenv("JDOODLE_CLIENT_SECRET")

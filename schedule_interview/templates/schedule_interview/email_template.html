@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% comment %} <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #1c6073, #2563eb); color: white; padding: 30px; text-align: center; }
+    .content { padding: 30px; }
+    .passcode-box { background: #fef3c7; border: 2px dashed #916e33; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; }
+    .passcode { font-size: 36px; font-weight: bold; letter-spacing: 10px; color: #92400e; font-family: 'Courier New', monospace; }
+    .button { display: inline-block; background: #2563eb; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+    .warning { background: #fee2e2; border-left: 4px solid #268adc; padding: 15px; margin: 20px 0; border-radius: 4px; }
+    .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+  </style> {% endcomment %}
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1> Interview Scheduled</h1>
+    </div>
+    <div class="content">
+      <p>Dear <strong>{{ candidate_name }}</strong>,</p>
+      <p>Your interview has been scheduled for:</p>
+      <p style="font-size: 18px;"><strong>{{ interview_datetime }}</strong></p>
+
+      <div class="passcode-box">
+        <p style="margin:0; font-size:14px; color:#92400e;">Your Interview Passcode:</p>
+        <p class="passcode">{{ passcode }}</p>
+        <p style="margin:0; font-size:12px; color:#78716c;">⚠️ Keep this confidential</p>
+      </div>
+
+      <p><strong>Step 1:</strong> Click the button below:</p>
+      <a href="{{ interview_link }}" class="button">Join Interview</a>
+
+      <p><strong>Step 2:</strong> Enter your passcode when prompted</p>
+
+      <div class="warning">
+        <strong> Important:</strong> Do not share this passcode with anyone.
+      </div>
+
+      <p>If the button doesn't work, copy this link:</p>
+      <p style="background:#f1f5f9; padding:12px; border-radius:5px; word-break:break-all; font-size:12px;">
+        {{ interview_link }}
+      </p>
+
+      <p>Good luck! </p>
+      <p>Best regards,<br><strong>Interview Team</strong></p>
+    </div>
+    <div class="footer">
+      <p>This is an automated email. Please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submitted!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #1e1e1e; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #252526; border: 1px solid #3c3c3c; border-radius: 12px; padding: 40px; max-width: 750px; width: 90%; }
+    .icon { font-size: 52px; margin-bottom: 16px; }
+    h1 { color: #4ec9b0; margin-bottom: 6px; }
+    .meta { color: #888; font-size: 13px; margin-bottom: 24px; }
+    .meta strong { color: #ccc; }
+    label { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 20px; margin-bottom: 6px; }
+    pre { background: #1e1e1e; border: 1px solid #3c3c3c; border-radius: 6px; padding: 14px; font-size: 13px; color: #d4d4d4; overflow-x: auto; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    .badge { display: inline-block; padding: 3px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #2d4a6a; color: #4e9ac9; margin-left: 10px; vertical-align: middle; }
+    .btn { display: inline-block; margin-top: 28px; padding: 10px 24px; background: #2d6a2d; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; }
+    .btn:hover { background: #3d8a3d; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon"></div>
+    <h1>Code Submitted! <span class="badge">{{ submission.status }}</span></h1>
+    <p class="meta">
+      Submission <strong>#{{ submission.id }}</strong> &nbsp;·&nbsp;
+      Language: <strong>{{ submission.language }}</strong> &nbsp;·&nbsp;
+      Question: <strong>{{ submission.question.title }}</strong>
+    </p>
+
+    <label>Your Code</label>
+    <pre>{{ submission.code }}</pre>
+
+    <label>Output</label>
+    <pre>{{ submission.output|default:"No output recorded" }}</pre>
+
+    <a href="/code/" class="btn">← Back to Home</a>
+  </div>
+</body>
+</html>

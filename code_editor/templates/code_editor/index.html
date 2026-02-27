@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Coding Question</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #1e1e1e; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .card { background: #252526; padding: 40px; border-radius: 12px; width: 500px; border: 1px solid #3c3c3c; }
+    h2 { margin-bottom: 24px; color: #4ec9b0; }
+    label { display: block; margin-bottom: 6px; color: #ccc; font-size: 14px; }
+    select { width: 100%; padding: 10px; background: #3c3c3c; color: white; border: 1px solid #555; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+    button { width: 100%; padding: 12px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #6d28d9; }
+    #output { margin-top: 24px; background: #1e1e1e; padding: 16px; border-radius: 8px; border: 1px solid #3c3c3c; display: none; }
+    #output h3 { color: #4ec9b0; margin-bottom: 10px; }
+    #output p { color: #ccc; font-size: 14px; line-height: 1.6; }
+    .start-btn { margin-top: 16px; background: #2d6a2d; }
+    .start-btn:hover { background: #3d8a3d; }
+    .loader { display: none; text-align: center; margin-top: 16px; color: #ccc; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2> Generate Coding Question</h2>
+
+    <label>Topic</label>
+    <select id="topic">
+      <option>Arrays</option>
+      <option>Strings</option>
+      <option>Linked Lists</option>
+      <option>Dynamic Programming</option>
+      <option>Trees</option>
+      <option>Sorting</option>
+      <option>Recursion</option>
+    </select>
+
+    <label>Difficulty</label>
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+
+    <label>Language</label>
+    <select id="language">
+      <option value="python">Python</option>
+      <option value="javascript">JavaScript</option>
+      <option value="java">Java</option>
+      <option value="cpp">C++</option>
+    </select>
+
+    <button onclick="generateQuestion()">⚡ Generate Question</button>
+    <div class="loader" id="loader">⏳ Generating question...</div>
+
+    <div id="output">
+      <h3 id="q-title"></h3>
+      <p id="q-desc"></p>
+      <br>
+      <p><strong>Example Input:</strong> <span id="q-input"></span></p>
+      <p><strong>Example Output:</strong> <span id="q-output"></span></p>
+      <p><strong>Constraints:</strong> <span id="q-constraints"></span></p>
+      <button class="start-btn" onclick="startCoding()">▶ Start Coding Round</button>
+    </div>
+  </div>
+
+  <script>
+    let questionId = null;
+
+    function getCookie(name) {
+      let cookieValue = null;
+      document.cookie.split(';').forEach(c => {
+        c = c.trim();
+        if (c.startsWith(name + '=')) cookieValue = decodeURIComponent(c.split('=')[1]);
+      });
+      return cookieValue;
+    }
+
+    async function generateQuestion() {
+      document.getElementById('loader').style.display = 'block';
+      document.getElementById('output').style.display = 'none';
+
+      const response = await fetch('/code/generate-question/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          topic: document.getElementById('topic').value,
+          difficulty: document.getElementById('difficulty').value,
+          language: document.getElementById('language').value,
+        })
+      });
+
+      const result = await response.json();
+      questionId = result.question_id;
+
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('output').style.display = 'block';
+      document.getElementById('q-title').innerText = result.question.title;
+      document.getElementById('q-desc').innerText = result.question.description;
+      document.getElementById('q-input').innerText = result.question.example_input;
+      document.getElementById('q-output').innerText = result.question.example_output;
+      document.getElementById('q-constraints').innerText = result.question.constraints;
+    }
+
+    function startCoding() {
+      window.location.href = `/code/coding-round/${questionId}/`;
+    }
+  </script>
+</body>
+</html>

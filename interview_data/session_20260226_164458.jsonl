@@ -1,0 +1,5 @@
+{"session": "f8930cf3-6194-4a09-a01d-133520ef6ffb", "role": "ai", "content": "What is Django and why use it?", "timestamp": "2026-02-26T16:44:58.507527"}
+{"session": "f8930cf3-6194-4a09-a01d-133520ef6ffb", "role": "candidate", "content": "We use Django for web development in Python.", "timestamp": "2026-02-26T16:45:17.963331", "score": 4, "total_score": 4}
+{"session": "f8930cf3-6194-4a09-a01d-133520ef6ffb", "role": "ai", "content": "Explain Django models and migrations.", "timestamp": "2026-02-26T16:45:18.294048"}
+{"session": "f8930cf3-6194-4a09-a01d-133520ef6ffb", "role": "candidate", "content": "Migrations and fighting related PY migrate. That's how we can migrate.", "timestamp": "2026-02-26T16:45:51.447742", "score": 2, "total_score": 6}
+{"session": "f8930cf3-6194-4a09-a01d-133520ef6ffb", "role": "ai", "content": "What is a Django view? Difference between function-based and class-based views?", "timestamp": "2026-02-26T16:45:51.764212"}

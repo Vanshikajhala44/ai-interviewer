@@ -34,17 +34,16 @@
 #     return " ".join([s.text for s in segments])
 
 
-import os
-from openai import OpenAI
+# # import whisper
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# model = whisper.load_model("tiny")  # tiny is fastest
 
-def speech_to_text(audio_file):
-    audio_file.seek(0)  # make sure pointer is at start
+# def speech_to_text(audio_file):
+#     audio_file.seek(0)
 
-    transcript = client.audio.transcriptions.create(
-        model="whisper-1",
-        file=audio_file
-    )
+#     with open("temp_audio.webm", "wb") as f:
+#         f.write(audio_file.read())
 
-    return transcript.text
+#     result = model.transcribe("temp_audio.webm")
+
+#     return result["text"]
