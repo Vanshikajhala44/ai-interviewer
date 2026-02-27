@@ -23,38 +23,35 @@ def interviewer_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
-@interviewer_required
+    
 def schedule_interview(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = InterviewForm(request.POST)
+        
         if form.is_valid():
-            interview = SecretInterview.objects.create(
-                candidate_name=form.cleaned_data['candidate_name'],
-                candidate_email=form.cleaned_data['candidate_email'],
-                interviewer_name=form.cleaned_data['interviewer_name'],
-                system_prompt=form.cleaned_data['system_prompt'],
-                interview_datetime=form.cleaned_data['interview_datetime'],
-                expires_at=form.cleaned_data.get('expires_at'),
-                coding_question=form.cleaned_data.get('coding_question', ''),
-                coding_topic=form.cleaned_data.get('coding_topic', 'Arrays'),
-                coding_difficulty=form.cleaned_data.get('coding_difficulty', 'medium'),
-                coding_language=form.cleaned_data.get('coding_language', 'python'),
-            )
-            interview_link = request.build_absolute_uri(
-                reverse('schedule_interview:verify_passcode', kwargs={'token': interview.token})
-            )
-            send_interview_invitation(
-                candidate_name=interview.candidate_name,
-                candidate_email=interview.candidate_email,
-                interview_link=interview_link,
-                interview_datetime=interview.interview_datetime,
-                passcode=interview.passcode,
-            )
+            interview = form.save()
+
+            interview_link = f"https://yoursite.com/interview/{interview.token}/"
+
+            # Email bhejne ki koshish karo
+            try:
+                send_interview_invitation(
+                    candidate_name=interview.candidate_name,
+                    candidate_email=interview.candidate_email,
+                    interview_link=interview_link,
+                    interview_datetime=interview.interview_datetime,
+                    passcode=interview.passcode,
+                )
+            except Exception as e:
+                # Email fail ho toh bhi app crash mat karo
+                print("Email Error:", e)
+
+            # Email success ya fail — dono case mein redirect karo
             return redirect('schedule_interview:schedule_success', token=interview.token)
     else:
         form = InterviewForm()
-    return render(request, 'schedule_interview/form.html', {'form': form})
 
+    return render(request, 'schedule_interview/form.html', {'form': form})
 
 def schedule_success(request, token):
     interview = SecretInterview.objects.get(token=token)
