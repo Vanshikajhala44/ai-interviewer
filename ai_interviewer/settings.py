@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
-ALLOWED_HOSTS = ['ai-interviewer-3ymy.onrender.com']
+# ALLOWED_HOSTS = ['ai-interviewer-3ymy.onrender.com']
 
 ALLOWED_HOSTS = ['*']
 
@@ -130,7 +130,7 @@ import os
 
 load_dotenv()
 
-print("Loaded GROQ KEY:", os.getenv("GROQ_API_KEY"))
+# print("Loaded GROQ KEY:", os.getenv("GROQ_API_KEY"))
 GROQ_API_KEY2 = os.getenv("GROQ_API_KEY2")
 import cloudinary
 import os
