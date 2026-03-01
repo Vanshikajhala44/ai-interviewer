@@ -23,7 +23,7 @@ def interviewer_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
-    
+@interviewer_required    
 def schedule_interview(request):
     if request.method == "POST":
         form = InterviewForm(request.POST)
@@ -49,16 +49,16 @@ def schedule_interview(request):
              reverse('schedule_interview:verify_passcode', kwargs={'token': interview.token})
               )
 
-            # try:
-            #     send_interview_invitation(
-            #         candidate_name=interview.candidate_name,
-            #         candidate_email=interview.candidate_email,
-            #         interview_link=interview_link,
-            #         interview_datetime=interview.interview_datetime,
-            #         passcode=interview.passcode,
-            #     )
-            # except Exception as e:
-            #     print("Email Error:", e)
+            try:
+                send_interview_invitation(
+                    candidate_name=interview.candidate_name,
+                    candidate_email=interview.candidate_email,
+                    interview_link=interview_link,
+                    interview_datetime=interview.interview_datetime,
+                    passcode=interview.passcode,
+                )
+            except Exception as e:
+                print("Email Error:", e)
 
             return redirect('schedule_interview:schedule_success', token=interview.token)
     else:
