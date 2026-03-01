@@ -23,8 +23,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
 # ALLOWED_HOSTS = ['ai-interviewer-3ymy.onrender.com']
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = ['ai-interviewer-3ymy.onrender.com', '0.0.0.0', '*']
 
 # Application definition
 
@@ -49,6 +48,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "ai_interviewer.urls"
@@ -122,6 +122,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

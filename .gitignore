@@ -1,7 +1,8 @@
-.env
 __pycache__/
 *.pyc
 env/
 venv/
 media/
 db.sqlite3
+config.bat
+node_modules
